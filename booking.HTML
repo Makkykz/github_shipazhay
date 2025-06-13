@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование Шипажая</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Оформление заявки на бронирование</h1>
+        <nav>
+            <a href="index.html">Главная</a> |
+            <a href="shipazhay_list.html">Все Шипажаи</a> |
+            <a href="booking.html">Бронирование</a> |
+            <a href="about.html">О нас</a> |
+            <a href="contact.html">Контакты</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Убрали блок с предупреждением -->
+        <form class="booking-form" id="bookingFormStatic" method="POST" action="#"> <!-- Добавили ID для формы -->
+            
+            <!-- Этот блок будет управляться JavaScript -->
+            <div id="shipazhay_selection_area">
+                <div class="form-group" id="shipazhay_selected_name_container" style="display:none;">
+                    <!-- Сюда JS вставит <h3>Вы бронируете: ...</h3> -->
+                </div>
+                <div class="form-group" id="shipazhay_dropdown_container">
+                    <label for="shipazhay_select">Выберите Шипажай/Программу:<span style="color:red;">*</span></label>
+                   <select name="shipazhay_name" id="shipazhay_select" required>
+    <option value="">-- Пожалуйста, выберите --</option>
+    <option value="Сарыагаш Курорт">Сарыагаш Курорт</option>
+    <option value="Алма-Арасан">Алма-Арасан</option>
+    <option value="Мойылды Санаторий">Мойылды Санаторий</option>
+    <option value="Окжетпес (Бурабай)">Окжетпес (Бурабай)</option>
+    <option value="Жаркент-Арасан">Жаркент-Арасан</option>
+    <option value="Санаторий Кокшетау">Санаторий Кокшетау</option>
+    <option value="Арай Делюкс Сарыагаш">Арай Делюкс Сарыагаш</option> <!-- НОВАЯ ОПЦИЯ -->
+</select>
+                </div>
+            </div>
+            <!-- Скрытое поле для имени шипажая, если он выбран через URL -->
+            <input type="hidden" id="hidden_shipazhay_name" name="shipazhay_name_fixed">
+
+
+           <div class="form-group">
+        <label for="full_name">Ваше ФИО:<span style="color:red;">*</span></label>
+        <input type="text" id="full_name" name="full_name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="phone">Контактный телефон:<span style="color:red;">*</span></label>
+        <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="example@mail.com">
+    </div>
+
+    <div class="form-group">
+        <label for="date_from">Дата заезда:<span style="color:red;">*</span></label>
+        <input type="date" id="date_from" name="date_from" required>
+    </div>
+
+    <div class="form-group">
+        <label for="date_to">Дата выезда:<span style="color:red;">*</span></label>
+        <input type="date" id="date_to" name="date_to" required>
+    </div>
+
+    <div class="form-group">
+        <label for="adults">Количество взрослых:<span style="color:red;">*</span></label>
+        <input type="number" id="adults" name="adults" min="1" value="1" required>
+    </div>
+
+    <div class="form-group">
+        <label for="children">Количество детей (до 12 лет):</label>
+        <input type="number" id="children" name="children" min="0" value="0">
+    </div>
+
+    <div class="form-group">
+        <label for="comments">Комментарии/Пожелания:</label>
+        <textarea id="comments" name="comments" rows="3" placeholder="Ваши особые пожелания..."></textarea>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Отправить заявку">
+    </div>
+</form>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const params = new URLSearchParams(window.location.search);
+                const shipazhayNameFromUrl = params.get('shipazhay');
+                
+                const selectElement = document.getElementById('shipazhay_select');
+                const hiddenInput = document.getElementById('hidden_shipazhay_name');
+                const selectedNameContainer = document.getElementById('shipazhay_selected_name_container');
+                const dropdownContainer = document.getElementById('shipazhay_dropdown_container');
+
+                if (shipazhayNameFromUrl) {
+                    let shipazhayFoundInSelect = false;
+                    if (selectElement) {
+                        for (let i = 0; i < selectElement.options.length; i++) {
+                            if (selectElement.options[i].value === shipazhayNameFromUrl) {
+                                selectElement.options[i].selected = true;
+                                shipazhayFoundInSelect = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(shipazhayFoundInSelect){
+                        const h3 = document.createElement('h3');
+                        h3.textContent = 'Вы бронируете: ' + shipazhayNameFromUrl;
+                        selectedNameContainer.innerHTML = ''; 
+                        selectedNameContainer.appendChild(h3);
+                        selectedNameContainer.style.display = 'block';
+                        dropdownContainer.style.display = 'none'; 
+                        hiddenInput.value = shipazhayNameFromUrl;
+                        if(selectElement) selectElement.removeAttribute('name'); 
+                    } else {
+                         selectedNameContainer.style.display = 'none';
+                         dropdownContainer.style.display = 'block';
+                         if(selectElement) selectElement.setAttribute('name', 'shipazhay_name');
+                         hiddenInput.value = '';
+                    }
+                } else {
+                    selectedNameContainer.style.display = 'none';
+                    dropdownContainer.style.display = 'block';
+                    if(selectElement) selectElement.setAttribute('name', 'shipazhay_name');
+                    hiddenInput.value = '';
+                }
+
+                // НОВЫЙ КОД: Обработка отправки формы для перехода на страницу подтверждения
+                const bookingForm = document.getElementById('bookingFormStatic');
+                if (bookingForm) {
+                    bookingForm.addEventListener('submit', function(event) {
+                        event.preventDefault(); // Отменяем стандартное поведение отправки формы
+                        // Собираем данные из формы (необязательно для простого редиректа, но может пригодиться если захочешь передать)
+                        // const formData = new FormData(bookingForm);
+                        // const params = new URLSearchParams();
+                        // for(const pair of formData.entries()){
+                        //    params.append(pair[0], pair[1]);
+                        // }
+                        // window.location.href = 'booking_confirmation.html?' + params.toString();
+                        
+                        // Просто перенаправляем на страницу подтверждения
+                        window.location.href = 'booking_confirmation.html';
+                    });
+                }
+            });
+        </script>
+    </main>
+
+    <footer>
+        <p>© 2025 Шипажай</p>
+    </footer>
+</body>
+</html>
